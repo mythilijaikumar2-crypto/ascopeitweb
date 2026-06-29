@@ -1,0 +1,262 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// 1. Roles Table
+model Role {
+  id          String       @id @default(uuid())
+  name        String       @unique
+  code        String       @unique // e.g. "SUPER_ADMIN", "HR", "MARKETING"
+  users       User[]
+  permissions Permission[] @relation("RolePermissions")
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@map("roles")
+}
+
+// 2. Permissions Table
+model Permission {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  code        String   @unique // e.g. "READ_BLOGS", "WRITE_BLOGS", "APPLY_JOBS"
+  roles       Role[]   @relation("RolePermissions")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("permissions")
+}
+
+// 3. Users Table
+model User {
+  id           String     @id @default(uuid())
+  email        String     @unique
+  passwordHash String
+  fullName     String
+  roleId       String
+  role         Role       @relation(fields: [roleId], references: [id])
+  status       String     @default("ACTIVE") // ACTIVE, SUSPENDED
+  blogs        Blog[]
+  auditLogs    AuditLog[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([email])
+  @@index([roleId])
+  @@map("users")
+}
+
+// 4. Contact Form Inquiries
+model Contact {
+  id             String   @id @default(uuid())
+  fullName       String
+  company        String
+  email          String
+  scope          String
+  budget         String
+  brief          String
+  servicesNeeded String[] @default([])
+  status         String   @default("NEW") // NEW, IN_PROGRESS, RESOLVED
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([email])
+  @@index([status])
+  @@map("contacts")
+}
+
+// 5. Careers (Job Applications)
+model Career {
+  id             String        @id @default(uuid())
+  jobId          String
+  jobTitle       String
+  fullName       String
+  email          String
+  phone          String
+  github         String?
+  notes          String?
+  resumeFileId   String
+  resumeFile     UploadedFile  @relation(fields: [resumeFileId], references: [id])
+  status         String        @default("SUBMITTED") // SUBMITTED, REVIEWED, HIRED, REJECTED
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([email])
+  @@index([jobId])
+  @@map("careers")
+}
+
+// 6. Internships
+model Internship {
+  id             String        @id @default(uuid())
+  trackId        String
+  trackTitle     String
+  name           String
+  email          String
+  phone          String
+  github         String?
+  notes          String?
+  resumeFileId   String
+  resumeFile     UploadedFile  @relation(fields: [resumeFileId], references: [id])
+  status         String        @default("SUBMITTED") // SUBMITTED, INTERVIEWING, SELECTED, REJECTED
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([email])
+  @@index([trackId])
+  @@map("internships")
+}
+
+// 7. Training Enrollments
+model TrainingEnrollment {
+  id         String   @id @default(uuid())
+  name       String
+  email      String
+  phone      String
+  course     String
+  experience String
+  status     String   @default("PENDING") // PENDING, CONFIRMED, CANCELLED
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([email])
+  @@index([course])
+  @@map("training_enrollments")
+}
+
+// 8. Blog Categories
+model BlogCategory {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  slug      String   @unique
+  blogs     Blog[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+  @@map("blog_categories")
+}
+
+// 9. Blogs Table
+model Blog {
+  id           String       @id @default(uuid())
+  title        String
+  slug         String       @unique
+  summary      String
+  content      String
+  categoryId   String
+  category     BlogCategory @relation(fields: [categoryId], references: [id])
+  authorId     String
+  author       User         @relation(fields: [authorId], references: [id])
+  status       String       @default("DRAFT") // DRAFT, PUBLISHED
+  publishedAt  DateTime?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@index([slug])
+  @@index([categoryId])
+  @@index([authorId])
+  @@map("blogs")
+}
+
+// 10. Case Studies
+model CaseStudy {
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  client      String
+  summary     String
+  metrics     String[] @default([])
+  status      String   @default("PUBLISHED") // DRAFT, PUBLISHED
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([slug])
+  @@map("case_studies")
+}
+
+// 11. Testimonials
+model Testimonial {
+  id          String   @id @default(uuid())
+  clientName  String
+  company     String
+  feedback    String
+  rating      Int      @default(5)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("testimonials")
+}
+
+// 12. Services Table
+model Service {
+  id          String   @id @default(uuid())
+  title       String   @unique
+  slug        String   @unique
+  description String
+  details     String
+  features    String[] @default([])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([slug])
+  @@map("services")
+}
+
+// 13. Technologies Table
+model Technology {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  category  String // e.g. "FRONTEND", "BACKEND", "DATABASE", "CLOUD"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
+  @@map("technologies")
+}
+
+// 14. Industries Table
+model Industry {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  code        String   @unique // e.g. "FINTECH", "HEALTHCARE"
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("industries")
+}
+
+// 15. Uploaded Files Metadata
+model UploadedFile {
+  id           String       @id @default(uuid())
+  originalName String
+  fileName     String       @unique // UUID-renamed file name on disk
+  mimeType     String
+  size         Int
+  filePath     String
+  careers      Career[]
+  internships  Internship[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@map("uploaded_files")
+}
+
+// 16. Audit Logs
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  action    String
+  ipAddress String?
+  timestamp DateTime @default(now())
+
+  @@index([userId])
+  @@map("audit_logs")
+}

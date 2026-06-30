@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Navbar } from '../components/Navbar'
@@ -7,6 +7,11 @@ import { pageTransition } from '../animations'
 
 export const MainLayout: React.FC = () => {
   const location = useLocation()
+
+  // Scroll to top on every route change
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+  }, [location.pathname])
 
   return (
     <div className="flex flex-col min-h-screen bg-background">

@@ -1,5 +1,5 @@
 import React from 'react'
-import { motion as motionElement } from 'framer-motion'
+import { motion } from 'framer-motion'
 import {
   FiTarget,
   FiEye,
@@ -11,7 +11,7 @@ import {
   FiTrendingUp,
   FiAward
 } from 'react-icons/fi'
-import { fadeIn, staggerContainer, heroContainer, heroItem } from '../animations'
+import { heroContainer, heroItem, revealLeft, revealRight, cardStagger, cardItem, viewportOnce } from '../animations'
 
 const About: React.FC = () => {
   const values = [
@@ -66,21 +66,21 @@ const About: React.FC = () => {
 
       {/* ================= HERO SECTION ================= */}
       <section className="pt-16 pb-20 md:pt-24 md:pb-28">
-        <motionElement.div
+        <motion.div
           variants={heroContainer}
           initial="hidden"
           animate="show"
           className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6"
         >
-          <motionElement.div
+          <motion.div
             variants={heroItem}
             className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-softLight/60 border border-accent/30 text-xs font-semibold text-primary font-heading uppercase tracking-wider"
           >
             <FiAward />
             Corporate Architecture
-          </motionElement.div>
+          </motion.div>
 
-          <motionElement.h1
+          <motion.h1
             variants={heroItem}
             className="text-4xl sm:text-5xl md:text-6xl font-heading font-extrabold tracking-tight leading-tight text-dark"
           >
@@ -88,15 +88,15 @@ const About: React.FC = () => {
             <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
               High-Availability Tech
             </span>
-          </motionElement.h1>
+          </motion.h1>
 
-          <motionElement.p
+          <motion.p
             variants={heroItem}
             className="text-base sm:text-lg text-secondaryText max-w-3xl mx-auto font-sans leading-relaxed"
           >
             Ascope Tech was founded by engineers to solve a critical industry challenge: the gap between beautiful aesthetics and robust, scalable, type-safe development. We build software architectures that last.
-          </motionElement.p>
-        </motionElement.div>
+          </motion.p>
+        </motion.div>
       </section>
 
       {/* ================= MISSION & VISION ================= */}
@@ -104,11 +104,11 @@ const About: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
             {/* Mission */}
-            <motionElement.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
+            <motion.div
+              variants={revealLeft}
+              initial="hidden"
+              whileInView="visible"
+              viewport={viewportOnce}
               className="glass-card p-8 md:p-10 flex gap-6 text-left relative overflow-hidden"
             >
               <div className="w-14 h-14 rounded-xl bg-softLight flex items-center justify-center shrink-0">
@@ -120,14 +120,14 @@ const About: React.FC = () => {
                   To build state-of-the-art digital products by combining pixel-perfect layout systems with modular, test-validated backend architectures, resolving engineering debt.
                 </p>
               </div>
-            </motionElement.div>
+            </motion.div>
 
             {/* Vision */}
-            <motionElement.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
+            <motion.div
+              variants={revealRight}
+              initial="hidden"
+              whileInView="visible"
+              viewport={viewportOnce}
               className="glass-card p-8 md:p-10 flex gap-6 text-left relative overflow-hidden"
             >
               <div className="w-14 h-14 rounded-xl bg-softLight flex items-center justify-center shrink-0">
@@ -139,7 +139,7 @@ const About: React.FC = () => {
                   To stand as the premier technology integration partner globally, known for setting the industry standard in type-safety, clean modular architectures, and luxury-level client experience.
                 </p>
               </div>
-            </motionElement.div>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -156,19 +156,19 @@ const About: React.FC = () => {
             </p>
           </div>
 
-          <motionElement.div
-            variants={staggerContainer()}
+          <motion.div
+            variants={cardStagger}
             initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, amount: 0.1 }}
+            whileInView="visible"
+            viewport={viewportOnce}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
           >
             {values.map((val, idx) => (
-              <motionElement.div
+              <motion.div
                 key={idx}
-                variants={fadeIn('up', idx * 0.05)}
+                variants={cardItem}
                 whileHover={{ y: -8, scale: 1.02 }}
-                className="glass-card p-8 text-left group hover:border-accent/40 transition-all duration-300 relative focus-within:ring-2 focus-within:ring-accent"
+                className="glass-card p-8 text-left group hover:border-accent/40 transition-all duration-300 relative"
               >
                 <div className="w-12 h-12 rounded-xl bg-softLight flex items-center justify-center mb-6 group-hover:bg-brand-gradient group-hover:text-white transition-all duration-300">
                   <div className="group-hover:filter group-hover:brightness-[100] transition-all duration-300">
@@ -181,9 +181,9 @@ const About: React.FC = () => {
                 <p className="text-secondaryText text-xs font-sans leading-relaxed">
                   {val.desc}
                 </p>
-              </motionElement.div>
+              </motion.div>
             ))}
-          </motionElement.div>
+          </motion.div>
         </div>
       </section>
 
@@ -199,14 +199,17 @@ const About: React.FC = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <motion.div
+            variants={cardStagger}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+            className="grid grid-cols-1 md:grid-cols-3 gap-8"
+          >
             {team.map((member, idx) => (
-              <motionElement.div
+              <motion.div
                 key={idx}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: idx * 0.15 }}
+                variants={cardItem}
                 whileHover={{ y: -8 }}
                 className="glass-card p-8 flex flex-col items-center text-center relative overflow-hidden group hover:border-accent/40 transition-all duration-300"
               >
@@ -230,9 +233,9 @@ const About: React.FC = () => {
                   <a href="#" className="hover:text-primary transition-colors" aria-label={`${member.name} LinkedIn`}><FiLinkedin size={18} /></a>
                   <a href="#" className="hover:text-primary transition-colors" aria-label={`${member.name} GitHub`}><FiGithub size={18} /></a>
                 </div>
-              </motionElement.div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -240,7 +243,13 @@ const About: React.FC = () => {
       <section className="py-20 md:py-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center text-left">
-            <div className="lg:col-span-6 space-y-6">
+            <motion.div
+              variants={revealLeft}
+              initial="hidden"
+              whileInView="visible"
+              viewport={viewportOnce}
+              className="lg:col-span-6 space-y-6"
+            >
               <h2 className="text-3xl md:text-4xl font-heading font-extrabold text-dark tracking-tight">
                 Our Collaborative Culture
               </h2>
@@ -260,26 +269,32 @@ const About: React.FC = () => {
                   </div>
                 ))}
               </div>
-            </div>
+            </motion.div>
 
             {/* Metrics display */}
-            <div className="lg:col-span-6 grid grid-cols-2 gap-6">
+            <motion.div
+              variants={cardStagger}
+              initial="hidden"
+              whileInView="visible"
+              viewport={viewportOnce}
+              className="lg:col-span-6 grid grid-cols-2 gap-6"
+            >
               {[
                 { title: 'Type Safety standard', val: '100%' },
                 { title: 'SOC2 Compliant code', val: 'Verified' },
                 { title: 'Average PR turn time', val: '< 3 hours' },
                 { title: 'Direct tech lead chat', val: 'Enabled' }
               ].map((metric, idx) => (
-                <div key={idx} className="glass-card p-6 border border-slate-100 text-center">
+                <motion.div key={idx} variants={cardItem} className="glass-card p-6 border border-slate-100 text-center">
                   <div className="text-2xl font-heading font-extrabold text-primary mb-1">
                     {metric.val}
                   </div>
                   <div className="text-[10px] sm:text-xs font-heading font-medium text-secondaryText uppercase tracking-wider">
                     {metric.title}
                   </div>
-                </div>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>

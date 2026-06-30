@@ -38,6 +38,17 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Apply rate limiting to all REST API endpoints
 app.use('/api', generalLimiter);
 
+// Root health check route
+app.get('/', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'Ascope Tech Backend API is running 🚀',
+    version: '1.0.0',
+    docs: '/api',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Bind main API router mapping
 app.use('/api', apiRouter);
 

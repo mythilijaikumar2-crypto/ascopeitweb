@@ -1,6 +1,8 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { FiGithub, FiTwitter, FiLinkedin } from 'react-icons/fi'
+import { FiLinkedin, FiFacebook, FiInstagram } from 'react-icons/fi'
+import { FaWhatsapp } from 'react-icons/fa'
+import ascopeLogo from '../assets/assopetech.png'
 
 export const Footer: React.FC = () => {
   return (
@@ -9,17 +11,29 @@ export const Footer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           {/* Brand block */}
           <div className="space-y-4 text-left">
-            <Link to="/" className="text-2xl font-heading font-extrabold text-primary flex items-center gap-2">
-              <span className="w-8 h-8 rounded-lg bg-brand-gradient flex items-center justify-center text-white text-base">A</span>
-              <span>Ascope <span className="text-secondary font-normal">Tech</span></span>
+            <Link to="/" className="flex items-center">
+              <img
+                src={ascopeLogo}
+                alt="Ascope Tech Logo"
+                className="h-16 w-auto object-contain"
+              />
             </Link>
             <p className="text-sm text-secondaryText font-sans leading-relaxed">
               Engineering premium, highly available custom web applications and design systems for enterprise-scale businesses globally.
             </p>
             <div className="flex gap-4 text-secondaryText">
-              <a href="#" className="hover:text-primary transition-colors" aria-label="LinkedIn"><FiLinkedin size={20} /></a>
-              <a href="#" className="hover:text-primary transition-colors" aria-label="Twitter"><FiTwitter size={20} /></a>
-              <a href="#" className="hover:text-primary transition-colors" aria-label="GitHub"><FiGithub size={20} /></a>
+              <a href="#" className="hover:text-primary transition-colors" aria-label="Facebook"><FiFacebook size={20} /></a>
+              <a 
+                href="https://www.linkedin.com/company/ascope-tech-private-limited/posts/?feedView=all" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="hover:text-primary transition-colors" 
+                aria-label="LinkedIn"
+              >
+                <FiLinkedin size={20} />
+              </a>
+              <a href="#" className="hover:text-primary transition-colors" aria-label="Instagram"><FiInstagram size={20} /></a>
+              <a href="#" className="hover:text-primary transition-colors" aria-label="WhatsApp"><FaWhatsapp size={20} /></a>
             </div>
           </div>
 

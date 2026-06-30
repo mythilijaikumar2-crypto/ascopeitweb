@@ -33,7 +33,11 @@ import {
   FiChevronUp,
   FiCheck,
   FiMonitor,
-  FiTarget
+  FiTarget,
+  FiActivity,
+  FiZap,
+  FiDatabase,
+  FiServer
 } from 'react-icons/fi'
 import { RiDoubleQuotesR } from 'react-icons/ri'
 
@@ -338,121 +342,219 @@ const Home: React.FC = () => {
 
   return (
     <div className="relative w-full overflow-hidden bg-background">
-      {/* Background Decorative Glow Orbs */}
-      <div className="glow-orb w-[400px] h-[400px] bg-softLight top-10 -left-48 animate-float"></div>
-      <div className="glow-orb w-[500px] h-[500px] bg-accent/20 top-[60vh] -right-48 animate-float-delayed"></div>
+      {/* Moving Background Aurora Orbs (Fixed) */}
+      <div className="glow-orb fixed w-[450px] h-[450px] bg-primary/10 top-[-10vh] left-[-10vw] animate-drift-orb-1"></div>
+      <div className="glow-orb fixed w-[500px] h-[500px] bg-secondary/10 top-[30vh] right-[-15vw] animate-drift-orb-2"></div>
+      <div className="glow-orb fixed w-[400px] h-[400px] bg-accent/15 top-[60vh] left-[20vw] animate-drift-orb-3"></div>
 
       {/* ================= 1. HERO SECTION ================= */}
-      <section className="relative pt-16 pb-20 md:pt-24 md:pb-32 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      <section className="relative h-screen min-h-[660px] flex items-start pt-20 pb-8 overflow-hidden">
+        {/* Modern moving grid background pattern (Fixed) */}
+        <div className="fixed inset-0 -z-10 pointer-events-none opacity-25 [mask-image:radial-gradient(ellipse_at_center,white,transparent)] overflow-hidden">
+          <div className="w-full h-[200%] animate-moving-grid">
+            <svg className="w-full h-full stroke-slate-200" strokeWidth="1" fill="none">
+              <defs>
+                <pattern id="hero-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                  <path d="M 40 0 L 0 0 0 40" />
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#hero-grid)" />
+            </svg>
+          </div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+            {/* Left Content Column */}
             <motion.div
               variants={heroContainer}
               initial="hidden"
               animate="show"
-              className="lg:col-span-7 space-y-8 text-left"
+              className="lg:col-span-7 space-y-6 text-left"
             >
               <motion.div
                 variants={heroItem}
-                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-softLight/60 border border-accent/30 text-xs font-semibold text-primary font-heading uppercase tracking-wider"
+                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-softLight/80 border border-accent/20 text-xs font-semibold text-primary font-heading uppercase tracking-widest shadow-sm"
               >
-                <span className="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
-                Next-Gen Product Engineering
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                Enterprise Systems Integrator
               </motion.div>
 
               <motion.h1
                 variants={heroItem}
-                className="text-4xl sm:text-5xl lg:text-6xl font-heading font-extrabold tracking-tight leading-tight text-dark"
+                className="text-4xl sm:text-5xl lg:text-6xl font-heading font-extrabold tracking-tight text-dark"
+                style={{ lineHeight: '1.16' }}
               >
-                Engineering Premium <br />
-                <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                <span className="block mb-2">Engineering Premium</span>
+                <span className="block mb-2 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                   Software Architectures
-                </span> <br />
-                for Digital Leaders
+                </span>
+                <span className="block">for Digital Leaders</span>
               </motion.h1>
 
               <motion.p
                 variants={heroItem}
                 className="text-base sm:text-lg text-secondaryText max-w-2xl font-sans leading-relaxed"
               >
-                Ascope Tech builds high-availability enterprise services, custom UI design tokens, and next-generation web/mobile platforms engineered to scale seamlessly.
+                Ascope Tech builds high-availability enterprise services, custom UI design systems, and next-generation web/mobile platforms engineered to scale seamlessly.
               </motion.p>
+
+              {/* Live Status Indicators / Key business specs */}
+              <motion.div 
+                variants={heroItem}
+                className="grid grid-cols-3 gap-4 pt-2 border-t border-slate-100/80 max-w-lg"
+              >
+                <div>
+                  <div className="flex items-center gap-1.5 text-sm font-heading font-bold text-dark">
+                    <FiZap className="text-secondary text-base animate-pulse" />
+                    <span>99.99%</span>
+                  </div>
+                  <p className="text-[10px] text-secondaryText uppercase tracking-wider font-semibold">Uptime SLA</p>
+                </div>
+                <div>
+                  <div className="flex items-center gap-1.5 text-sm font-heading font-bold text-dark">
+                    <FiActivity className="text-primary text-base" />
+                    <span>&lt; 14ms</span>
+                  </div>
+                  <p className="text-[10px] text-secondaryText uppercase tracking-wider font-semibold">Avg Latency</p>
+                </div>
+                <div>
+                  <div className="flex items-center gap-1.5 text-sm font-heading font-bold text-dark">
+                    <FiShield className="text-emerald-500 text-base" />
+                    <span>SOC2</span>
+                  </div>
+                  <p className="text-[10px] text-secondaryText uppercase tracking-wider font-semibold">Security Spec</p>
+                </div>
+              </motion.div>
 
               <motion.div
                 variants={heroItem}
-                className="flex flex-wrap gap-4"
+                className="flex flex-wrap gap-4 pt-2"
               >
-                <Link to="/contact" className="btn-primary flex items-center gap-2">
+                <Link to="/contact" className="btn-primary flex items-center gap-2 group shadow-lg hover:shadow-primary/20 transition-all duration-300">
                   <span>Start Your Project</span>
-                  <FiArrowRight />
+                  <FiArrowRight className="group-hover:translate-x-1 transition-transform" />
                 </Link>
-                <Link to="/services" className="btn-secondary">
+                <Link to="/services" className="btn-secondary transition-all">
                   Explore Services
                 </Link>
               </motion.div>
             </motion.div>
 
-            {/* Right Interactive Mockup / Graphic */}
-            <div className="lg:col-span-5 relative mt-8 lg:mt-0 flex justify-center">
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-                className="relative w-full max-w-[420px] aspect-square rounded-3xl bg-brand-gradient p-[1px] shadow-premium overflow-hidden"
+            {/* Right 3D Interactive Isometric Tech Stack Visualizer */}
+            <div className="lg:col-span-5 relative mt-16 lg:mt-0 h-[480px] w-full flex items-center justify-center select-none lg:-translate-y-4">
+              {/* Decorative glow panel behind */}
+              <div className="absolute w-64 h-64 rounded-full bg-primary/10 blur-[80px] -z-10 animate-pulse"></div>
+
+              <div 
+                className="relative w-full max-w-[340px] h-[380px]"
+                style={{
+                  transform: 'perspective(1200px) rotateX(24deg) rotateY(-18deg) rotateZ(6deg)',
+                  transformStyle: 'preserve-3d',
+                }}
               >
-                <div className="w-full h-full bg-white rounded-3xl p-6 flex flex-col justify-between">
-                  <div className="flex justify-between items-center pb-4 border-b border-slate-100">
+                {/* 1. BOTTOM LAYER: Cloud Cluster Infrastructure (Slate Card) */}
+                <motion.div
+                  initial={{ opacity: 0, y: 50, z: -50 }}
+                  animate={{ opacity: 1, y: 0, z: 0 }}
+                  transition={{ duration: 0.8, delay: 0.3 }}
+                  whileHover={{ translateZ: 15, y: -5 }}
+                  className="absolute top-[44%] left-0 w-[84%] bg-slate-950 border border-slate-800/80 rounded-2xl p-4 shadow-2xl flex flex-col justify-between transition-shadow duration-300 group/bottom cursor-pointer"
+                  style={{
+                    transform: 'translateZ(0px)',
+                    boxShadow: '0 20px 40px -10px rgba(37, 99, 235, 0.15)',
+                  }}
+                >
+                  <div className="flex justify-between items-center pb-2 border-b border-slate-900">
+                    <span className="text-[9px] text-slate-500 uppercase tracking-widest font-heading font-bold">Layer 01 // Cloud Cluster</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
+                  </div>
+                  <div className="py-3 flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-primary group-hover/bottom:text-secondary transition-colors">
+                      <FiServer className="text-base" />
+                    </div>
+                    <div className="text-left">
+                      <p className="text-[11px] font-heading font-bold text-white">Kubernetes Cluster Pods</p>
+                      <p className="text-[9px] text-slate-400 font-sans">8 Active Nodes // AP-South</p>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center text-[9px] text-slate-500 font-sans">
+                    <span>SLA Commit: 99.99%</span>
+                    <span className="text-emerald-400 font-semibold flex items-center gap-1">
+                      <span className="w-1 h-1 rounded-full bg-emerald-400"></span>
+                      Online
+                    </span>
+                  </div>
+                </motion.div>
+
+                {/* 2. MIDDLE LAYER: Microservices & API Engine (Blue Card) */}
+                <motion.div
+                  initial={{ opacity: 0, y: 30, z: -25 }}
+                  animate={{ opacity: 1, y: 0, z: 30 }}
+                  transition={{ duration: 0.8, delay: 0.2 }}
+                  whileHover={{ translateZ: 50, y: -10 }}
+                  className="absolute top-[22%] left-[8%] w-[84%] bg-slate-900/95 backdrop-blur-md border border-slate-800/80 rounded-2xl p-4 shadow-2xl flex flex-col justify-between transition-shadow duration-300 group/mid cursor-pointer"
+                  style={{
+                    transform: 'translateZ(30px)',
+                    boxShadow: '0 20px 40px -10px rgba(4, 156, 203, 0.2)',
+                  }}
+                >
+                  <div className="flex justify-between items-center pb-2 border-b border-slate-800">
+                    <span className="text-[9px] text-slate-400 uppercase tracking-widest font-heading font-bold">Layer 02 // API Engine</span>
+                    <div className="flex items-center gap-1 text-[9px] text-slate-400 font-semibold">
+                      <FiActivity className="text-primary text-xs" />
+                      <span>12ms</span>
+                    </div>
+                  </div>
+                  <div className="py-3 flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-slate-950 border border-slate-800 flex items-center justify-center text-secondary group-hover/mid:text-primary transition-colors">
+                      <FiDatabase className="text-base" />
+                    </div>
+                    <div className="text-left">
+                      <p className="text-[11px] font-heading font-bold text-white">Type-Safe Endpoints</p>
+                      <p className="text-[9px] text-slate-400 font-sans">TRPC Schema // SOC2 Certified</p>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center text-[9px] text-slate-400 font-sans">
+                    <span>1,480 req/s</span>
+                    <span className="text-primary font-bold">tRPC Router</span>
+                  </div>
+                </motion.div>
+
+                {/* 3. TOP LAYER: Luxury User Experience (White / Light Glass Card) */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10, z: 0 }}
+                  animate={{ opacity: 1, y: 0, z: 60 }}
+                  transition={{ duration: 0.8, delay: 0.1 }}
+                  whileHover={{ translateZ: 85, y: -15 }}
+                  className="absolute top-0 left-[16%] w-[84%] bg-white/95 border border-slate-100 rounded-2xl p-4 shadow-premium flex flex-col justify-between transition-shadow duration-300 group/top cursor-pointer"
+                  style={{
+                    transform: 'translateZ(60px)',
+                  }}
+                >
+                  <div className="flex justify-between items-center pb-2 border-b border-slate-100">
+                    <span className="text-[9px] text-slate-500 uppercase tracking-widest font-heading font-bold">Layer 03 // User Experience</span>
                     <div className="flex gap-1.5">
-                      <span className="w-3 h-3 rounded-full bg-rose-400"></span>
-                      <span className="w-3 h-3 rounded-full bg-amber-400"></span>
-                      <span className="w-3 h-3 rounded-full bg-emerald-400"></span>
-                    </div>
-                    <span className="text-xs font-semibold text-secondaryText font-heading uppercase tracking-wide">
-                      Ascope Engine v2.4
-                    </span>
-                  </div>
-
-                  <div className="flex-grow flex flex-col justify-center space-y-4 my-6">
-                    <div className="flex items-center gap-3 p-3 bg-slate-50/40 rounded-xl border border-slate-100">
-                      <div className="w-10 h-10 rounded-lg bg-softLight flex items-center justify-center">
-                        <FiCode className="text-primary text-xl" />
-                      </div>
-                      <div className="text-left">
-                        <p className="text-xs font-semibold text-dark">Clean TypeScript Modules</p>
-                        <p className="text-[10px] text-secondaryText">99.8% Test Coverage</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-3 p-3 bg-slate-50/40 rounded-xl border border-slate-100 transform translate-x-4">
-                      <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center">
-                        <FiCloud className="text-emerald-500 text-xl" />
-                      </div>
-                      <div className="text-left">
-                        <p className="text-xs font-semibold text-dark">Auto Scaling Clusters</p>
-                        <p className="text-[10px] text-secondaryText">Zero Downtime Strategy</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-3 p-3 bg-slate-50/40 rounded-xl border border-slate-100">
-                      <div className="w-10 h-10 rounded-lg bg-accent/20 flex items-center justify-center">
-                        <FiLayout className="text-primary text-xl" />
-                      </div>
-                      <div className="text-left">
-                        <p className="text-xs font-semibold text-dark">Custom Design Tokens</p>
-                        <p className="text-[10px] text-secondaryText">Dynamic Responsive Core</p>
-                      </div>
+                      <span className="w-2 h-2 rounded-full bg-rose-400"></span>
+                      <span className="w-2 h-2 rounded-full bg-amber-400"></span>
+                      <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
                     </div>
                   </div>
-
-                  <div className="flex justify-between items-center pt-4 border-t border-slate-100 text-[10px] text-secondaryText">
-                    <span>Active Branches: 4</span>
-                    <span className="text-emerald-500 font-semibold flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
-                      Sync Complete
-                    </span>
+                  <div className="py-3 flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-softLight flex items-center justify-center text-primary group-hover/top:bg-brand-gradient group-hover/top:text-white transition-all duration-300">
+                      <FiLayout className="text-base" />
+                    </div>
+                    <div className="text-left">
+                      <p className="text-[11px] font-heading font-bold text-dark">Micro-Animated Interface</p>
+                      <p className="text-[9px] text-secondaryText font-sans">Framer Motion // Tailwind CSS</p>
+                    </div>
                   </div>
-                </div>
-              </motion.div>
+                  <div className="flex justify-between items-center text-[9px] text-secondaryText font-sans">
+                    <span>Performance: 99%</span>
+                    <span className="text-primary font-bold">Core Web Vitals</span>
+                  </div>
+                </motion.div>
+              </div>
             </div>
           </div>
         </div>
@@ -677,7 +779,7 @@ const Home: React.FC = () => {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-4 py-2 text-xs font-heading font-bold uppercase tracking-wider rounded-lg transition-colors capitalize ${
+                className={`px-4 py-2 text-xs font-heading font-bold uppercase tracking-wider rounded-lg transition-colors ${
                   activeTab === tab ? 'bg-primary text-white shadow-sm' : 'text-secondaryText hover:text-dark'
                 }`}
               >

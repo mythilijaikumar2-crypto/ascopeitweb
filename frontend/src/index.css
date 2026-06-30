@@ -95,3 +95,45 @@
   background: #049CCB;
   transition: all 0.3s ease;
 }
+
+/* Redesigned Hero Background & Stacking layers */
+@keyframes moving-grid {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(40px);
+  }
+}
+
+.animate-moving-grid {
+  animation: moving-grid 20s linear infinite;
+}
+
+@keyframes drift-orb {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.95);
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+.animate-drift-orb-1 {
+  animation: drift-orb 15s ease-in-out infinite;
+}
+
+.animate-drift-orb-2 {
+  animation: drift-orb 20s ease-in-out infinite 2s;
+}
+
+.animate-drift-orb-3 {
+  animation: drift-orb 18s ease-in-out infinite 4s;
+}
+

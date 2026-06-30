@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import ascopeLogo from '../../assets/assopetech.png'
 
 export const LoadingScreen: React.FC = () => {
   const [progress, setProgress] = useState(0)
@@ -40,20 +41,21 @@ export const LoadingScreen: React.FC = () => {
       <div className="absolute bottom-[30vh] right-[25vw] w-[300px] h-[300px] rounded-full bg-accent/25 filter blur-[80px] opacity-30 animate-pulse pointer-events-none"></div>
 
       <div className="w-full max-w-sm flex flex-col items-center space-y-8 relative z-10">
-        {/* Pulsing Brand Initials Logo */}
+        {/* Actual Logo with pulse animation */}
         <motion.div
-          animate={{ scale: [0.96, 1.04, 0.96] }}
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: [1, 1.05, 1] }}
           transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-          className="w-16 h-16 rounded-2xl bg-brand-gradient text-white font-heading font-extrabold text-2xl flex items-center justify-center shadow-premium"
         >
-          A
+          <img
+            src={ascopeLogo}
+            alt="Ascope Tech"
+            className="h-20 w-auto object-contain"
+          />
         </motion.div>
 
         {/* Info Text */}
         <div className="w-full text-center space-y-2">
-          <h2 className="font-heading font-bold text-dark text-base tracking-wide uppercase">
-            Ascope Tech
-          </h2>
           <p className="text-xs text-secondaryText font-sans transition-all duration-300">
             {statusMessage}
           </p>

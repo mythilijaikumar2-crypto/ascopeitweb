@@ -5,14 +5,15 @@ import {
   FiMail,
   FiCalendar,
   FiGlobe,
-  FiGithub,
-  FiTwitter,
   FiLinkedin,
+  FiFacebook,
+  FiInstagram,
   FiCheckCircle,
   FiPlus,
   FiMinus,
   FiSend
 } from 'react-icons/fi'
+import { FaWhatsapp } from 'react-icons/fa'
 import { heroContainer, heroItem } from '../animations'
 import { api } from '../services/api'
 
@@ -169,9 +170,18 @@ const Contact: React.FC = () => {
               <div className="pt-6 border-t border-slate-100 space-y-3">
                 <h4 className="text-xs uppercase font-heading font-bold text-slate-400">Engineering Index</h4>
                 <div className="flex gap-4 text-secondaryText">
-                  <a href="#" className="hover:text-primary transition-colors" aria-label="LinkedIn"><FiLinkedin size={20} /></a>
-                  <a href="#" className="hover:text-primary transition-colors" aria-label="Twitter"><FiTwitter size={20} /></a>
-                  <a href="#" className="hover:text-primary transition-colors" aria-label="GitHub"><FiGithub size={20} /></a>
+                  <a href="#" className="hover:text-primary transition-colors" aria-label="Facebook"><FiFacebook size={20} /></a>
+                  <a 
+                    href="https://www.linkedin.com/company/ascope-tech-private-limited/posts/?feedView=all" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="hover:text-primary transition-colors" 
+                    aria-label="LinkedIn"
+                  >
+                    <FiLinkedin size={20} />
+                  </a>
+                  <a href="#" className="hover:text-primary transition-colors" aria-label="Instagram"><FiInstagram size={20} /></a>
+                  <a href="#" className="hover:text-primary transition-colors" aria-label="WhatsApp"><FaWhatsapp size={20} /></a>
                 </div>
               </div>
             </div>

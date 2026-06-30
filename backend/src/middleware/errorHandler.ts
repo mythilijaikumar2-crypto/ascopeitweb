@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import multer from 'multer';
 import { HTTP_STATUS } from '../constants/statusCodes';
 import { logger } from '../config/logger';
 
@@ -15,11 +16,26 @@ export class AppError extends Error {
 }
 
 export const errorHandler = (
-  err: Error | AppError,
+  err: Error | AppError | multer.MulterError,
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
+  // Handle Multer-specific errors (file size, unexpected field, etc.)
+  if (err instanceof multer.MulterError) {
+    const message =
+      err.code === 'LIMIT_FILE_SIZE'
+        ? 'Resume size should not exceed 2 MB.'
+        : `Upload error: ${err.message}`;
+
+    logger.warn(`[Multer] Code: ${err.code} | Path: ${req.path} | ${message}`);
+
+    return res.status(HTTP_STATUS.BAD_REQUEST).json({
+      success: false,
+      message
+    });
+  }
+
   const statusCode = err instanceof AppError ? err.statusCode : HTTP_STATUS.INTERNAL_SERVER_ERROR;
   const message = err.message || 'An unexpected error occurred';
 

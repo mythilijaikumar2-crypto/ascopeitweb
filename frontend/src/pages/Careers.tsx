@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import React from 'react'
+import { motion } from 'framer-motion'
+import { Link, useNavigate } from 'react-router-dom'
 import {
   FiDollarSign,
   FiGlobe,
@@ -10,35 +11,14 @@ import {
   FiUserCheck,
   FiCpu,
   FiSmile,
-  FiX,
-  FiUpload,
-  FiCheckCircle
+  FiMapPin,
+  FiClock
 } from 'react-icons/fi'
 import { heroContainer, heroItem } from '../animations'
-import { api } from '../services/api'
-
-interface JobRole {
-  id: string
-  title: string
-  location: string
-  type: string
-  dept: string
-  desc: string
-  responsibilities: string[]
-  requirements: string[]
-}
+import { openRoles, speculativeRole } from '../data/jobsData'
 
 const Careers: React.FC = () => {
-  // Modal states
-  const [selectedJob, setSelectedJob] = useState<JobRole | null>(null)
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [phone, setPhone] = useState('')
-  const [github, setGithub] = useState('')
-  const [notes, setNotes] = useState('')
-  const [resume, setResume] = useState<File | null>(null)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isSubmitted, setIsSubmitted] = useState(false)
+  const navigate = useNavigate()
 
   const perks = [
     {
@@ -85,139 +65,6 @@ const Careers: React.FC = () => {
       desc: 'A 30-minute sync to finalize compensation details, review remote processes, and confirm onboarding logistics.'
     }
   ]
-
-  const openRoles: JobRole[] = [
-    {
-      id: 'go-backend',
-      title: 'Senior Go Backend Engineer',
-      location: 'Remote',
-      type: 'Full-Time',
-      dept: 'Backend Systems',
-      desc: 'We are seeking a concurrency specialist to design high-throughput Go microservices, manage PostgreSQL indexing, and construct event stream pipelines.',
-      responsibilities: [
-        'Build modular backend workers utilizing channels and select concurrency models.',
-        'Design database schema migrations, views, and optimize queries under 10ms.',
-        'Define clean REST and gRPC API contract schemas with TypeScript frontends.'
-      ],
-      requirements: [
-        '5+ years programming backends with Go/Node in production systems.',
-        'Solid knowledge of relational database structures and Redis cache pipelines.',
-        'Hands-on experience with Docker container building and basic VPC network security.'
-      ]
-    },
-    {
-      id: 'react-architect',
-      title: 'Lead React Architect',
-      location: 'Remote',
-      type: 'Full-Time',
-      dept: 'Frontend Products',
-      desc: 'Join us to design pixel-perfect design system modules, optimize browser execution times, and set up state-management standards across products.',
-      responsibilities: [
-        'Construct reusable component matrices conversion Figma designs into HTML structures.',
-        'Optimize Web Vitals indexes, implementing bundle tree-shaking and component lazy-loading.',
-        'Coordinate state structures across client networks utilizing modern context tools.'
-      ],
-      requirements: [
-        '6+ years developing frontend systems with React and TypeScript.',
-        'Deep understanding of browser rendering pipelines, DOM reflows, and performance audits.',
-        'Prior experience building customizable corporate design systems.'
-      ]
-    },
-    {
-      id: 'sre-engineer',
-      title: 'Senior Site Reliability Engineer (SRE)',
-      location: 'Remote',
-      type: 'Full-Time',
-      dept: 'Infrastructure',
-      desc: 'Configure auto-scaling clusters, manage VPC routers, and help developers deploy packages with automated, zero-error CI/CD pipelines.',
-      responsibilities: [
-        'Define Terraform architecture blueprints for cluster replications.',
-        'Set up automated logging metrics using Prometheus and Grafana alerts.',
-        'Manage cloud hosting configurations to optimize server usage and costs.'
-      ],
-      requirements: [
-        '4+ years managing production cloud infrastructure (AWS or GCP).',
-        'Expertise in writing Kubernetes manifests and managing ingress controllers.',
-        'Familiarity with writing shell automation scripts and setting up GitHub Actions.'
-      ]
-    }
-  ]
-
-  const speculativeRole: JobRole = {
-    id: 'speculative',
-    title: 'Speculative Engineering Candidate',
-    location: 'Remote',
-    type: 'Full-Time / Contract',
-    dept: 'General Alignment',
-    desc: 'Submit your CV and engineering focus to be considered for future engineering positions on our team.',
-    responsibilities: [
-      'Proactively design robust features in your alignment area.',
-      'Maintain premium architecture standards and write modular, dry code.',
-      'Collaborate with developers inside a flat remote environment.'
-    ],
-    requirements: [
-      'Proven development achievements in frontend, backend, or DevOps.',
-      'Commitment to type safety, clean code reviews, and modular systems.',
-      'Ability to collaborate independently inside asynchronous pipelines.'
-    ]
-  }
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      setResume(e.target.files[0])
-    }
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!name || !email || !phone || !resume || !selectedJob) {
-      alert('Please fill out all required fields and upload your resume.')
-      return
-    }
-    setIsSubmitting(true)
-    try {
-      // Step 1: Upload resume file and get a fileId from the server
-      const uploadResult = await api.uploadFile(resume)
-      if (!uploadResult.success || !uploadResult.fileId) {
-        alert(`File upload failed: ${uploadResult.message}`)
-        return
-      }
-
-      // Step 2: Submit application with the returned fileId
-      const result = await api.submitCareerApplication({
-        jobId: selectedJob.id,
-        jobTitle: selectedJob.title,
-        fullName: name,
-        email: email,
-        phone: phone,
-        github: github || undefined,
-        notes: notes || undefined,
-        resumeFileId: uploadResult.fileId
-      })
-
-      if (result.success) {
-        setIsSubmitted(true)
-      } else {
-        alert(`Application submission failed: ${result.message}`)
-      }
-    } catch (error: any) {
-      console.error(error)
-      alert(`Error submitting application: ${error.message || error}`)
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
-
-  const resetForm = () => {
-    setName('')
-    setEmail('')
-    setPhone('')
-    setGithub('')
-    setNotes('')
-    setResume(null)
-    setIsSubmitted(false)
-    setSelectedJob(null)
-  }
 
   return (
     <div className="relative w-full">
@@ -347,7 +194,7 @@ const Careers: React.FC = () => {
               Active Job Listings
             </h2>
             <p className="text-secondaryText text-sm sm:text-base font-sans">
-              Explore our current open positions. Click Apply Now to submit your details and resume.
+              Click on any role to view the full job description and apply directly.
             </p>
           </div>
 
@@ -359,7 +206,8 @@ const Careers: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5 }}
-                className="glass-card border border-slate-100 shadow-sm p-6 sm:p-8 flex flex-col justify-between hover:shadow-premium hover:border-primary/20 transition-all duration-300 bg-white"
+                className="glass-card border border-slate-100 shadow-sm p-6 sm:p-8 flex flex-col justify-between hover:shadow-premium hover:border-primary/20 transition-all duration-300 bg-white cursor-pointer group"
+                onClick={() => navigate(`/careers/${job.id}`)}
               >
                 <div className="space-y-6">
                   {/* Card Header */}
@@ -368,15 +216,18 @@ const Careers: React.FC = () => {
                       <span className="px-2.5 py-0.5 rounded bg-softLight text-primary text-[10px] font-bold uppercase tracking-wider font-heading">
                         {job.dept}
                       </span>
-                      <h3 className="text-xl font-heading font-extrabold text-dark">
+                      <h3 className="text-xl font-heading font-extrabold text-dark group-hover:text-primary transition-colors duration-200">
                         {job.title}
                       </h3>
-                      <div className="flex gap-4 text-xs text-secondaryText font-sans font-medium">
+                      <div className="flex flex-wrap gap-4 text-xs text-secondaryText font-sans font-medium">
                         <span className="flex items-center gap-1">
-                          <FiGlobe /> {job.location}
+                          <FiMapPin className="text-primary" /> {job.location}
                         </span>
                         <span className="flex items-center gap-1">
-                          <FiUserCheck /> {job.type}
+                          <FiClock className="text-primary" /> {job.type}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <FiUserCheck className="text-primary" /> Remote
                         </span>
                       </div>
                     </div>
@@ -388,7 +239,7 @@ const Careers: React.FC = () => {
                   </p>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-6 border-t border-slate-100">
-                    {/* Responsibilities (Skills) */}
+                    {/* Responsibilities */}
                     <div className="space-y-3">
                       <h4 className="font-heading font-bold text-dark text-xs uppercase tracking-wider">
                         Skills & Responsibilities
@@ -403,7 +254,7 @@ const Careers: React.FC = () => {
                       </ul>
                     </div>
 
-                    {/* Requirements (Qualifications) */}
+                    {/* Requirements */}
                     <div className="space-y-3">
                       <h4 className="font-heading font-bold text-dark text-xs uppercase tracking-wider">
                         Qualifications & Specs
@@ -420,15 +271,16 @@ const Careers: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Apply Button */}
+                {/* Apply CTA */}
                 <div className="pt-6 mt-6 border-t border-slate-100 flex justify-end">
-                  <button
-                    onClick={() => setSelectedJob(job)}
+                  <Link
+                    to={`/careers/${job.id}`}
+                    onClick={(e) => e.stopPropagation()}
                     className="btn-primary w-full sm:w-auto inline-flex items-center justify-center gap-2"
                   >
-                    <span>Apply Now</span>
-                    <FiArrowRight />
-                  </button>
+                    <span>View & Apply</span>
+                    <FiArrowRight className="group-hover:translate-x-1 transition-transform duration-200" />
+                  </Link>
                 </div>
               </motion.div>
             ))}
@@ -446,199 +298,16 @@ const Careers: React.FC = () => {
             We are always seeking senior software designers, cloud operators, and product developers. Submit a speculative resume and git index.
           </p>
           <div>
-            <button
-              onClick={() => setSelectedJob(speculativeRole)}
+            <Link
+              to={`/careers/${speculativeRole.id}`}
               className="btn-primary inline-flex items-center gap-2 mx-auto w-fit"
             >
               <span>Submit Speculative CV</span>
               <FiArrowRight />
-            </button>
+            </Link>
           </div>
         </div>
       </section>
-
-      {/* ================= APPLICATION FORM MODAL ================= */}
-      <AnimatePresence>
-        {selectedJob && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={resetForm}
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-            />
-
-            {/* Modal Container */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 350 }}
-              className="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden z-10 border border-slate-100 max-h-[90vh] flex flex-col"
-            >
-              {/* Header */}
-              <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                <div>
-                  <span className="text-[10px] uppercase tracking-wider font-bold text-primary px-2 py-0.5 rounded bg-softLight font-heading">
-                    Job Application
-                  </span>
-                  <h3 className="text-lg font-heading font-extrabold text-dark mt-1">
-                    {selectedJob.title}
-                  </h3>
-                </div>
-                <button
-                  onClick={resetForm}
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-secondaryText hover:bg-slate-100 hover:text-dark transition-colors"
-                >
-                  <FiX className="text-lg" />
-                </button>
-              </div>
-
-              {/* Form Body */}
-              <div className="p-6 overflow-y-auto flex-1">
-                {isSubmitted ? (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="text-center py-8 space-y-4"
-                  >
-                    <div className="w-16 h-16 bg-green-50 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4 border border-green-100 shadow-sm">
-                      <FiCheckCircle className="text-3xl animate-bounce" />
-                    </div>
-                    <h4 className="text-xl font-heading font-extrabold text-dark">
-                      Application Submitted!
-                    </h4>
-                    <p className="text-sm text-secondaryText leading-relaxed max-w-sm mx-auto">
-                      Thank you for applying to the <span className="font-semibold text-primary">{selectedJob.title}</span> position at Ascope Tech. Our technical team will review your info and get back to you shortly.
-                    </p>
-                    <button
-                      onClick={resetForm}
-                      className="btn-primary w-full max-w-xs mt-6 mx-auto"
-                    >
-                      Close Window
-                    </button>
-                  </motion.div>
-                ) : (
-                  <form onSubmit={handleSubmit} className="space-y-4 text-left">
-                    <div className="space-y-1">
-                      <label className="text-xs font-heading font-bold text-dark uppercase tracking-wider">
-                        Full Name <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        placeholder="John Doe"
-                        className="w-full px-4 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-primary transition-colors bg-slate-50/30"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="space-y-1">
-                        <label className="text-xs font-heading font-bold text-dark uppercase tracking-wider">
-                          Email Address <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="email"
-                          required
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          placeholder="john@example.com"
-                          className="w-full px-4 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-primary transition-colors bg-slate-50/30"
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <label className="text-xs font-heading font-bold text-dark uppercase tracking-wider">
-                          Phone Number <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="tel"
-                          required
-                          value={phone}
-                          onChange={(e) => setPhone(e.target.value)}
-                          placeholder="+1 (555) 000-0000"
-                          className="w-full px-4 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-primary transition-colors bg-slate-50/30"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-xs font-heading font-bold text-dark uppercase tracking-wider">
-                        GitHub / Portfolio URL
-                      </label>
-                      <input
-                        type="url"
-                        value={github}
-                        onChange={(e) => setGithub(e.target.value)}
-                        placeholder="https://github.com/johndoe"
-                        className="w-full px-4 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-primary transition-colors bg-slate-50/30"
-                      />
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-xs font-heading font-bold text-dark uppercase tracking-wider">
-                        Upload Resume / CV <span className="text-red-500">*</span>
-                      </label>
-                      <div className="relative border-2 border-dashed border-slate-200 rounded-lg p-4 bg-slate-50/30 text-center hover:bg-slate-50 transition-colors cursor-pointer group">
-                        <input
-                          type="file"
-                          required
-                          accept=".pdf,.doc,.docx"
-                          onChange={handleFileChange}
-                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                        />
-                        <div className="space-y-1">
-                          <FiUpload className="text-2xl text-secondaryText group-hover:text-primary transition-colors mx-auto" />
-                          <p className="text-xs font-medium text-dark">
-                            {resume ? resume.name : 'Click to upload or drag resume file'}
-                          </p>
-                          <p className="text-[10px] text-secondaryText">
-                            PDF, DOC, DOCX up to 10MB
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-xs font-heading font-bold text-dark uppercase tracking-wider">
-                        Cover Note / Message
-                      </label>
-                      <textarea
-                        rows={3}
-                        value={notes}
-                        onChange={(e) => setNotes(e.target.value)}
-                        placeholder="Tell us about your engineering experience..."
-                        className="w-full px-4 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-primary transition-colors bg-slate-50/30 resize-none"
-                      />
-                    </div>
-
-                    <button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="btn-primary w-full mt-4 flex items-center justify-center gap-2"
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          <span>Submitting Application...</span>
-                        </>
-                      ) : (
-                        <>
-                          <span>Submit Application</span>
-                          <FiArrowRight />
-                        </>
-                      )}
-                    </button>
-                  </form>
-                )}
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
     </div>
   )
 }

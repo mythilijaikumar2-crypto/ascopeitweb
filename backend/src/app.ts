@@ -15,6 +15,13 @@ import { HTTP_STATUS } from './constants/statusCodes';
 
 const app = express();
 
+// Fix: BigInt cannot be serialized by JSON.stringify by default.
+// resumeSize is stored as BIGINT in PostgreSQL and returned as BigInt by Prisma.
+// We convert it to a Number automatically in every JSON response.
+(BigInt.prototype as any).toJSON = function () {
+  return Number(this);
+};
+
 // Enable security headers via Helmet
 app.use(helmet());
 

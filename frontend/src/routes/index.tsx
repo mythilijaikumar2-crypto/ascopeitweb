@@ -8,6 +8,7 @@ const About = lazy(() => import('../pages/About'))
 const Services = lazy(() => import('../pages/Services'))
 const Portfolio = lazy(() => import('../pages/Portfolio'))
 const Careers = lazy(() => import('../pages/Careers'))
+const CareerDetail = lazy(() => import('../pages/CareerDetail'))
 const Internship = lazy(() => import('../pages/Internship'))
 const Training = lazy(() => import('../pages/Training'))
 const Blog = lazy(() => import('../pages/Blog'))
@@ -63,6 +64,14 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={<LoadingFallback />}>
             <Careers />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'careers/:jobId',
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <CareerDetail />
           </Suspense>
         ),
       },

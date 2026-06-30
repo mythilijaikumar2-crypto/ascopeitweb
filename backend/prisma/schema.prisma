@@ -72,7 +72,7 @@ model Contact {
 
 // 5. Careers (Job Applications)
 model Career {
-  id             String        @id @default(uuid())
+  id             String    @id @default(uuid())
   jobId          String
   jobTitle       String
   fullName       String
@@ -80,11 +80,14 @@ model Career {
   phone          String
   github         String?
   notes          String?
-  resumeFileId   String
-  resumeFile     UploadedFile  @relation(fields: [resumeFileId], references: [id])
-  status         String        @default("SUBMITTED") // SUBMITTED, REVIEWED, HIRED, REJECTED
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  resumeName     String    @db.VarChar(255)
+  resumeType     String    @db.VarChar(100)
+  resumeSize     BigInt
+  resumeData     Bytes
+  uploadedAt     DateTime  @default(now())
+  status         String    @default("SUBMITTED") // SUBMITTED, REVIEWED, HIRED, REJECTED
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   @@index([email])
   @@index([jobId])
@@ -232,7 +235,7 @@ model Industry {
   @@map("industries")
 }
 
-// 15. Uploaded Files Metadata
+// 15. Uploaded Files Metadata (used by Internship only now)
 model UploadedFile {
   id           String       @id @default(uuid())
   originalName String
@@ -240,7 +243,6 @@ model UploadedFile {
   mimeType     String
   size         Int
   filePath     String
-  careers      Career[]
   internships  Internship[]
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt

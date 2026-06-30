@@ -16,7 +16,7 @@ export interface ContactPayload {
   servicesNeeded?: string[]
 }
 
-// Job Application Form Payload — uses resumeFileId after upload step
+// Job Application Form Payload — resume sent as multipart file (no resumeFileId)
 export interface CareerPayload {
   jobId: string
   jobTitle: string
@@ -25,7 +25,19 @@ export interface CareerPayload {
   phone: string
   github?: string
   notes?: string
-  resumeFileId: string
+  resume: File
+}
+
+// Candidate Update Payload
+export interface CareerUpdatePayload {
+  jobTitle?: string
+  fullName?: string
+  email?: string
+  phone?: string
+  github?: string
+  notes?: string
+  status?: string
+  resume?: File
 }
 
 // Internship Application Form Payload — uses resumeFileId after upload step
@@ -49,23 +61,51 @@ export interface TrainingPayload {
   experience: string
 }
 
+// ─── Candidate metadata type (no binary) ─────────────────────────────────────
+export interface CandidateMeta {
+  id: string
+  jobId: string
+  jobTitle: string
+  fullName: string
+  email: string
+  phone: string
+  github?: string
+  notes?: string
+  resumeName: string
+  resumeType: string
+  resumeSize: number
+  uploadedAt: string
+  status: string
+  createdAt: string
+  updatedAt: string
+}
+
 /**
  * Handles API submissions.
  */
 export const api = {
   /**
-   * Step 1: Upload a resume file — returns { fileId, originalName, mimeType, size }
-   * This must be called BEFORE submitting a career or internship application.
+   * Submit a job application with resume in a single multipart request.
+   * Resume is sent as a file field named "resume".
    */
-  async uploadFile(file: File): Promise<{ success: boolean; fileId?: string; message?: string }> {
+  async submitCareerApplication(
+    payload: CareerPayload
+  ): Promise<{ success: boolean; message: string; data?: CandidateMeta }> {
     try {
       const formData = new FormData()
-      formData.append('file', file)
+      formData.append('jobId', payload.jobId)
+      formData.append('jobTitle', payload.jobTitle)
+      formData.append('fullName', payload.fullName)
+      formData.append('email', payload.email)
+      formData.append('phone', payload.phone)
+      if (payload.github) formData.append('github', payload.github)
+      if (payload.notes) formData.append('notes', payload.notes)
+      formData.append('resume', payload.resume)
 
-      const response = await fetch(`${API_BASE_URL}/upload`, {
+      const response = await fetch(`${API_BASE_URL}/careers/apply`, {
         method: 'POST',
         body: formData
-        // Note: Do NOT set Content-Type header — browser sets it automatically with boundary
+        // Note: Do NOT set Content-Type — browser sets it with boundary automatically
       })
 
       const data = await response.json()
@@ -74,11 +114,116 @@ export const api = {
         throw new Error(data?.message || `Server returned HTTP status ${response.status}`)
       }
 
-      return { success: true, fileId: data.data?.fileId }
+      return data
     } catch (error: any) {
-      console.error('API Error: uploadFile failed', error)
-      return { success: false, message: error.message || 'File upload failed' }
+      console.error('API Error: submitCareerApplication failed', error)
+      return { success: false, message: error.message || 'Application submission failed' }
     }
+  },
+
+  /**
+   * Get all career candidates (metadata only, no resume binary).
+   * Requires auth token.
+   */
+  async getCandidates(
+    token: string,
+    limit = 20,
+    offset = 0
+  ): Promise<{ success: boolean; data?: CandidateMeta[]; message?: string }> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/careers/list?limit=${limit}&offset=${offset}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      const data = await response.json()
+      if (!response.ok) throw new Error(data?.message || `HTTP ${response.status}`)
+      return data
+    } catch (error: any) {
+      return { success: false, message: error.message || 'Failed to fetch candidates' }
+    }
+  },
+
+  /**
+   * Get single candidate metadata by ID.
+   * Requires auth token.
+   */
+  async getCandidate(
+    token: string,
+    id: string
+  ): Promise<{ success: boolean; data?: CandidateMeta; message?: string }> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/careers/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      const data = await response.json()
+      if (!response.ok) throw new Error(data?.message || `HTTP ${response.status}`)
+      return data
+    } catch (error: any) {
+      return { success: false, message: error.message || 'Failed to fetch candidate' }
+    }
+  },
+
+  /**
+   * Update candidate info and optionally replace resume.
+   * Requires auth token.
+   */
+  async updateCandidate(
+    token: string,
+    id: string,
+    payload: CareerUpdatePayload
+  ): Promise<{ success: boolean; message: string; data?: CandidateMeta }> {
+    try {
+      const formData = new FormData()
+      if (payload.jobTitle) formData.append('jobTitle', payload.jobTitle)
+      if (payload.fullName) formData.append('fullName', payload.fullName)
+      if (payload.email) formData.append('email', payload.email)
+      if (payload.phone) formData.append('phone', payload.phone)
+      if (payload.github !== undefined) formData.append('github', payload.github)
+      if (payload.notes !== undefined) formData.append('notes', payload.notes)
+      if (payload.status) formData.append('status', payload.status)
+      if (payload.resume) formData.append('resume', payload.resume)
+
+      const response = await fetch(`${API_BASE_URL}/careers/${id}`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData
+      })
+
+      const data = await response.json()
+      if (!response.ok) throw new Error(data?.message || `HTTP ${response.status}`)
+      return data
+    } catch (error: any) {
+      return { success: false, message: error.message || 'Failed to update candidate' }
+    }
+  },
+
+  /**
+   * Delete a candidate and their resume from the database.
+   * Requires auth token.
+   */
+  async deleteCandidate(
+    token: string,
+    id: string
+  ): Promise<{ success: boolean; message: string }> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/careers/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      const data = await response.json()
+      if (!response.ok) throw new Error(data?.message || `HTTP ${response.status}`)
+      return data
+    } catch (error: any) {
+      return { success: false, message: error.message || 'Failed to delete candidate' }
+    }
+  },
+
+  /**
+   * Get the resume stream URL for a candidate.
+   * ?download=true  → triggers browser download with original filename
+   * ?download=false → opens resume inline in browser tab (preview)
+   */
+  getResumeUrl(id: string, download = false): string {
+    return `${API_BASE_URL}/careers/${id}/resume?download=${download}`
   },
 
   /**
@@ -100,30 +245,6 @@ export const api = {
       return await response.json()
     } catch (error: any) {
       console.error('API Error: submitContact failed', error)
-      return { success: false, message: error.message || 'API request failed' }
-    }
-  },
-
-  /**
-   * Submit Careers Job Application — requires resumeFileId from uploadFile() first
-   */
-  async submitCareerApplication(payload: CareerPayload): Promise<{ success: boolean; message: string }> {
-    try {
-      const response = await fetch(`${API_BASE_URL}/careers/apply`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data?.message || `Server returned HTTP status ${response.status}`)
-      }
-
-      return data
-    } catch (error: any) {
-      console.error('API Error: submitCareerApplication failed', error)
       return { success: false, message: error.message || 'API request failed' }
     }
   },

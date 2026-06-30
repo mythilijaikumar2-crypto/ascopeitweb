@@ -6,7 +6,7 @@ import * as internshipController from '../controllers/internshipController';
 import * as trainingController from '../controllers/trainingController';
 import * as blogController from '../controllers/blogController';
 import * as publicController from '../controllers/publicController';
-import * as uploadController from '../controllers/uploadController';
+import { resumeUpload } from '../controllers/uploadController';
 
 import { authenticateJWT, requireRoles } from '../middleware/auth';
 import { validateRequest } from '../middleware/validate';
@@ -31,22 +31,66 @@ router.get(
 
 // ================= SCOPING & FORM INQUIRIES =================
 router.post('/contact', validateRequest(schemas.contactSchema), contactController.submitContact);
-router.post('/careers/apply', validateRequest(schemas.careerApplySchema), careerController.submitCareer);
 router.post('/internship/apply', validateRequest(schemas.internshipApplySchema), internshipController.submitInternship);
 router.post('/training/enroll', validateRequest(schemas.trainingEnrollSchema), trainingController.enroll);
 
-// Admin List endpoints (Protected to SUPER_ADMIN, ADMIN, HR)
-router.get(
-  '/contacts/list',
-  authenticateJWT,
-  requireRoles([ROLES.SUPER_ADMIN, ROLES.ADMIN]),
-  contactController.listInquiries
+// ================= CAREER ROUTES =================
+// Public: Submit new application (multipart/form-data with resume file)
+router.post(
+  '/careers/apply',
+  resumeUpload.single('resume'),
+  careerController.submitCareer
 );
+
+// Protected: List all candidates (metadata only, no binary)
 router.get(
   '/careers/list',
   authenticateJWT,
   requireRoles([ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.HR]),
   careerController.listCareers
+);
+
+// Protected: Get single candidate metadata
+router.get(
+  '/careers/:id',
+  authenticateJWT,
+  requireRoles([ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.HR]),
+  careerController.getCareer
+);
+
+// Protected: Update candidate info and/or replace resume
+router.put(
+  '/careers/:id',
+  authenticateJWT,
+  requireRoles([ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.HR]),
+  resumeUpload.single('resume'),
+  careerController.updateCareer
+);
+
+// Protected: Delete candidate and resume
+router.delete(
+  '/careers/:id',
+  authenticateJWT,
+  requireRoles([ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.HR]),
+  careerController.deleteCareer
+);
+
+// Protected: Stream resume from DB (inline preview or force download)
+// ?download=true  → Content-Disposition: attachment (browser download)
+// ?download=false → Content-Disposition: inline (browser preview)
+router.get(
+  '/careers/:id/resume',
+  authenticateJWT,
+  requireRoles([ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.HR]),
+  careerController.getCareerResume
+);
+
+// ================= ADMIN LIST ENDPOINTS =================
+router.get(
+  '/contacts/list',
+  authenticateJWT,
+  requireRoles([ROLES.SUPER_ADMIN, ROLES.ADMIN]),
+  contactController.listInquiries
 );
 router.get(
   '/internships/list',
@@ -107,13 +151,6 @@ router.post(
   authenticateJWT,
   requireRoles([ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.MARKETING]),
   publicController.addTestimonial
-);
-
-// ================= UPLOADS ROUTE =================
-router.post(
-  '/upload',
-  uploadController.uploadConfig.single('file'),
-  uploadController.handleFileUpload
 );
 
 export const apiRouter = router;

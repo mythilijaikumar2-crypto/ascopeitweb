@@ -17,7 +17,7 @@ export const contactSchema = z.object({
   servicesNeeded: z.array(z.string()).optional()
 });
 
-// 3. Careers Job Apply Validator
+// 3. Careers Job Apply Validator (resume comes as multipart file, not JSON)
 export const careerApplySchema = z.object({
   jobId: z.string().min(1, 'Provide a valid jobId'),
   jobTitle: z.string().min(2, 'Provide a valid jobTitle'),
@@ -25,8 +25,18 @@ export const careerApplySchema = z.object({
   email: z.string().email('Provide a valid email address'),
   phone: z.string().min(8, 'Phone number must be at least 8 digits'),
   github: z.string().url('Provide a valid GitHub profile URL').optional().or(z.literal('')),
+  notes: z.string().optional()
+});
+
+// 3b. Career Update Validator (all fields optional for partial update)
+export const careerUpdateSchema = z.object({
+  jobTitle: z.string().min(2).optional(),
+  fullName: z.string().min(2).optional(),
+  email: z.string().email().optional(),
+  phone: z.string().min(8).optional(),
+  github: z.string().url().optional().or(z.literal('')),
   notes: z.string().optional(),
-  resumeFileId: z.string().uuid('Provide a valid resumeFileId UUID')
+  status: z.enum(['SUBMITTED', 'REVIEWED', 'HIRED', 'REJECTED']).optional()
 });
 
 // 4. Internship Track Apply Validator

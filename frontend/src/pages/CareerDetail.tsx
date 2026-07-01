@@ -4,7 +4,6 @@ import { motion } from 'framer-motion'
 import {
   FiArrowLeft,
   FiGlobe,
-  FiUserCheck,
   FiCpu,
   FiSmile,
   FiUpload,

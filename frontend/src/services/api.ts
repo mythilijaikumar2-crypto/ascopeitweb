@@ -40,7 +40,7 @@ export interface CareerUpdatePayload {
   resume?: File
 }
 
-// Internship Application Form Payload — uses resumeFileId after upload step
+// Internship Application Form Payload — resume sent as File directly
 export interface InternshipPayload {
   trackId: string
   trackTitle: string
@@ -49,7 +49,8 @@ export interface InternshipPayload {
   phone: string
   github?: string
   notes?: string
-  resumeFileId: string
+  resumeFileId?: string
+  resume?: File
 }
 
 // Training Enrollment Form Payload
@@ -250,14 +251,52 @@ export const api = {
   },
 
   /**
-   * Submit Internship application — requires resumeFileId from uploadFile() first
+   * Upload a resume file and get a fileId back.
+   * Used by the internship application form for a two-step upload flow.
+   */
+  async uploadFile(
+    file: File
+  ): Promise<{ success: boolean; fileId?: string; message: string }> {
+    try {
+      const formData = new FormData()
+      formData.append('resume', file)
+
+      const response = await fetch(`${API_BASE_URL}/upload/resume`, {
+        method: 'POST',
+        body: formData
+      })
+
+      const data = await response.json()
+      if (!response.ok) {
+        throw new Error(data?.message || `Server returned HTTP status ${response.status}`)
+      }
+
+      return data
+    } catch (error: any) {
+      console.error('API Error: uploadFile failed', error)
+      return { success: false, message: error.message || 'File upload failed' }
+    }
+  },
+
+  /**
+   * Submit Internship application — uses multipart/form-data with resume file
    */
   async submitInternshipApplication(payload: InternshipPayload): Promise<{ success: boolean; message: string }> {
     try {
+      const formData = new FormData()
+      formData.append('trackId', payload.trackId)
+      formData.append('trackTitle', payload.trackTitle)
+      formData.append('name', payload.name)
+      formData.append('email', payload.email)
+      formData.append('phone', payload.phone)
+      if (payload.github) formData.append('github', payload.github)
+      if (payload.notes) formData.append('notes', payload.notes)
+      if (payload.resumeFileId) formData.append('resumeFileId', payload.resumeFileId)
+      if (payload.resume) formData.append('resume', payload.resume)
+
       const response = await fetch(`${API_BASE_URL}/internship/apply`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: formData
       })
 
       const data = await response.json()
